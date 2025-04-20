@@ -1,12 +1,30 @@
 const express = require("express");
-const app = express();//construye el objeto app
-
-const http = require("https").createServer(app);
 const cors = require("cors");
-
+require('./app/config/database');    // Conexión DB
+const http = require('http');
+const app = require('./app/app');
 const PORT = process.env.PORT || 5000;
-//cons uri = process.env.MONGO_URI;
 
-http.listen(PORT, () => {
-    console.log(`Listening to ${PORT}`);
+
+http
+  .createServer(app)
+  .listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+
+app.use(cors());
+app.use(express.json());
+
+// Importar rutas
+const productoRoutes = require('./app/routes/productoRoutes');
+const reservaRoutes  = require('./app/routes/reservaRoutes');
+
+// Montar routers bajo /api
+app.use('/api/productos', productoRoutes);
+app.use('/api/reserva',   reservaRoutes);
+
+// Handler global de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Ocurrió un error en el servidor' });
 });
+
+module.exports = app;
