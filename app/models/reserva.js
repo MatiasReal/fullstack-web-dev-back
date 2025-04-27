@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const reservaSchema = new mongoose.Schema({
-  cliente: { type: String, required: true }, 
+  cliente: { type: String, required: true }, //tipo usuarios
   productos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'productos' }],
   tiempoInicio: { type: Date, required: true },
   turnos: { type: Number, min: 1, max: 3, required: true }, // Turnos consecutivos (1-3)

@@ -3,8 +3,8 @@ const cors       = require('cors');
 const bodyParser = require('body-parser');
 const path       = require('path');
 
-const productoRoutes = require('./routes/productoRoutes');
-const reservaRoutes  = require('./routes/reservaRoutes');
+const productoRoutes = require('../routes/productoRoutes');
+const reservaRoutes  = require('../routes/reservaRoutes');
 
 const app = express();
 

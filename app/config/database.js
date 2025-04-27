@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// URI CORREGIDA (ejemplo con contraseña codificada)
 const uri = "mongodb+srv://matimaxpower:cuervo1011@cluster0.yp07r.mongodb.net/FsBackEnd?retryWrites=true&w=majority";
 
 const clientOptions = {
@@ -11,20 +10,18 @@ const clientOptions = {
     }
 };
 
-async function connectDB() {
+async function run() {
     try {
+        // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
         await mongoose.connect(uri, clientOptions);
+        await mongoose.connection.db.admin().command({ ping: 1 });
         console.log("✅ Conexión exitosa a MongoDB Atlas");
-
-        // Mantener conexión activa
-        mongoose.connection.on('connected', () => {
-            console.log('🔄 Conexión activa');
-        });
-
-    } catch (error) {
-        console.error('⛔ Error crítico:', error.message);
+    } catch (err) {
+        console.error("❌ Error conectando a MongoDB Atlas:", err);
         process.exit(1);
     }
 }
 
-connectDB();
+run().catch(console.dir);
+
+module.exports = mongoose;

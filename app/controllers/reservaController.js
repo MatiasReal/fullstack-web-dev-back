@@ -1,6 +1,8 @@
 const reserva = require('../models/reserva');
 const Product = require('../models/productos');
 
+
+
 async function createReserva(req, res) {
   try {
     const { cliente, productos, tiempoInicio, turnos, moneda, metodoDePago, seguroTormenta } = req.body;
@@ -16,6 +18,7 @@ async function createReserva(req, res) {
     if (maxBookingTime < minBookingTime) {
       return res.status(400).json({ error: "La reserva debe hacerse con al menos 48h de anticipación" });
     }
+
 
     // Calcular precio total
     const productList = await Product.find({ _id: { $in: productos } });
@@ -95,7 +98,7 @@ async function cancelReserva(req, res) {
       return res.status(404).json({ error: "Reserva no encontrada" });
     }
 
-    // (Opcional) aquí podrías chequear la lógica de “hasta 2h antes”
+    
     reserva.estado = 'CANCELADO';
     await reserva.save();
     res.json(reserva);

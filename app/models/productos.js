@@ -6,7 +6,8 @@ const productSchema = new mongoose.Schema({
   precioPorTurno: { type: Number, required: true }, // Precio por turno de 30min
   requiresCasco: { type: Boolean, default: false },
   requiresChaleco: { type: Boolean, default: false },
-  maxPersonas: { type: Number, default: 1 }
+  maxPersonas: { type: Number, default: 1 },
+  estadoUso: { type: String, enum: ['DISPONIBLE', 'MANTENIMIENTO', 'RESERVADO'], default: 'DISPONIBLE' },
 });
 
 module.exports = mongoose.model('productos', productSchema);
