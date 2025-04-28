@@ -2,7 +2,6 @@
 const express = require('express');
 const reservaController = require('../controllers/reservaController');
 const productoController = require('../controllers/productosController');
-
 const router = express.Router();
 
 // POST   /api/reserva

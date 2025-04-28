@@ -3,11 +3,10 @@ const Product = require('../models/productos');
 
 
 
-async function createReserva(req, res) {
+async function createReserva(req, res, next) {
   try {
     const { cliente, productos, tiempoInicio, turnos, moneda, metodoDePago, seguroTormenta } = req.body;
-
-    // Validar campos obligatorios
+    
     if (!cliente||!productos || !tiempoInicio || !turnos || !moneda || !metodoDePago) {
       return res.status(400).json({ error: "Todos los campos son obligatorios" });
     }
@@ -22,7 +21,15 @@ async function createReserva(req, res) {
 
     // Calcular precio total
     const productList = await Product.find({ _id: { $in: productos } });
+
     let subtotal = productList.reduce((acc, product) => acc + product.precioPorTurno, 0) * turnos;
+
+
+    // Verificar si alguno ya está reservado
+    const productoReservado = productList.find(p => p.estadoUso === 'RESERVADO');
+    if (productoReservado) {
+      return res.status(400).json({ error: `El producto ${productoReservado.nombre} ya está reservado.` });
+    }
 
     // Aplicar descuento del 10% por múltiples productos
     if (productList.length > 1) subtotal *= 0.9;
@@ -42,7 +49,11 @@ async function createReserva(req, res) {
       seguroTormenta
     });
 
-    res.status(201).json(newReserva);
+    next(); 
+    
+
+    //res.status(201).json(newReserva);
+    return;
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

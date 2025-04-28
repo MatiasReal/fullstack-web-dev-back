@@ -1,6 +1,7 @@
 const express = require('express');
 const Product = require('../models/productos');
 
+
 async function createProducto(req, res) {
   try {
     // Extraemos todos los campos, incluido 'tipo'
@@ -28,32 +29,21 @@ async function createProducto(req, res) {
   }
 };
 
-async function updateEstadoUso(req, res, next) {
+async function updateEstadoUso(req, res) {
   try {
-    const { id } = req.params;
-    const { tipo, nombre, precioPorTurno, requiresCasco, requiresChaleco, maxPersonas,estadoUso } = req.body;
+    const productos = req.body.productos; 
 
-    const allowedTypes = ['JETSKY', 'CUATRICICLO', 'BUCEO', 'SURF'];
-    if (!allowedTypes.includes(tipo)) {
-      return res.status(400).json({ error: `'tipo' debe ser uno de los valores: ${allowedTypes.join(', ')}` });
+    if (productos.length === 0) {
+      return res.status(400).json({ error: "No se han proporcionado productos" });
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, {
-      tipo,
-      nombre,
-      precioPorTurno,
-      requiresCasco,
-      requiresChaleco,
-      maxPersonas,
-      estadoUso: 'RESERVADO' 
-    }, { new: true });
+    await Product.updateMany(
+      { _id: { $in: productos } },
+      { estadoUso: 'RESERVADO' }
+    );
+    res.status(201).json({ message: "Reservado correctamente" });
+    console.log("Estado de uso actualizado a 'RESERVADO' para los productos:", productos);
 
-    if (!updatedProduct) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-
-    res.json(updatedProduct);
-    next();
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

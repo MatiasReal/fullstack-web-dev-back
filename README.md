@@ -78,9 +78,3 @@ fullstack-web-dev/
 - **Backend**: Node.js, Express.js
 - **Base de Datos**: MongoDB (Mongoose ODM)
 - **Otros**: Body-parser, CORS
-
-## Contribuciones
-Las contribuciones son bienvenidas. Por favor, abre un issue o envía un pull request para sugerir mejoras.
-
-## Licencia
-Este proyecto está bajo la Licencia MIT.
