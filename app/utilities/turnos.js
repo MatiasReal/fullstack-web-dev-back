@@ -26,13 +26,12 @@ module.exports = function validarConsecutivos(req, res, next) {
           error: 'La reserva no puede cruzar la medianoche en el mismo día.'
         });
       }
-  
-      // Si quieres, aquí vendría la comprobación de solapamientos con BD...
-  
-      // 4) todo ok
+
       req.body.rango = { start, end };
       next();
     } catch (err) {
       res.status(500).json({ error: 'Error validando los turnos.' });
     }
   };
+
+  //No supe implementarlo hasta el momento.

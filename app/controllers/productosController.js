@@ -1,10 +1,10 @@
 const express = require('express');
 const Product = require('../models/productos');
 
-
+// Función para crear un nuevo producto
 async function createProducto(req, res) {
   try {
-    // Extraemos todos los campos, incluido 'tipo'
+
     const { tipo, nombre, precioPorTurno, requiresCasco, requiresChaleco, maxPersonas } = req.body;
     
 
@@ -29,6 +29,7 @@ async function createProducto(req, res) {
   }
 };
 
+// Función para actualizar el estado de uso de los productos
 async function updateEstadoUso(req, res) {
   try {
     const productos = req.body.productos; 

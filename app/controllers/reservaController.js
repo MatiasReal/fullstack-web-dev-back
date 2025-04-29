@@ -1,8 +1,8 @@
-const reserva = require('../models/reserva');
+const Reserva = require('../models/reserva');
 const Product = require('../models/productos');
 
 
-
+//Función para crear una reserva
 async function createReserva(req, res, next) {
   try {
     const { cliente, productos, tiempoInicio, turnos, moneda, metodoDePago, seguroTormenta } = req.body;
@@ -38,7 +38,7 @@ async function createReserva(req, res, next) {
     const total = seguroTormenta ? subtotal * 1.5 : subtotal;
 
     // Crear reserva
-    const newReserva = await reserva.create({
+    const newReserva = await Reserva.create({
       cliente,
       productos,
       tiempoInicio,
@@ -52,13 +52,13 @@ async function createReserva(req, res, next) {
     next(); 
     
 
-    //res.status(201).json(newReserva);
     return;
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 }
 
+// Función para actualizar una reserva
 async function updateReserva(req, res) {
   try {
     const { id } = req.params;
@@ -71,18 +71,15 @@ async function updateReserva(req, res) {
       seguroTormenta
     } = req.body;
 
-    // validaciones mínimas
     if (!productos || !tiempoInicio || !turnos || !moneda || !metodoDePago) {
       return res.status(400).json({ error: "Todos los campos son obligatorios" });
     }
 
-    // Recalcula el precioTotal (igual que en createReserva)
     const productList = await Product.find({ _id: { $in: productos } });
     let subtotal = productList.reduce((acc, p) => acc + p.precioPorTurno, 0) * turnos;
     if (productList.length > 1) subtotal *= 0.9;
     const total = seguroTormenta ? subtotal * 1.5 : subtotal;
 
-    // Ejecuta el update
     const reservaActualizada = await Reserva.findByIdAndUpdate(
       id,
       { productos, tiempoInicio, turnos, moneda, metodoDePago, seguroTormenta, precioTotal: total },
@@ -109,10 +106,23 @@ async function cancelReserva(req, res) {
       return res.status(404).json({ error: "Reserva no encontrada" });
     }
 
-    
-    reserva.estado = 'CANCELADO';
-    await reserva.save();
-    res.json(reserva);
+    const ahora = Date.now();
+    const tiempoInicio = new Date(reserva.tiempoInicio).getTime();
+    const tiempoPosibleCancelacion = tiempoInicio - (2 * 60 * 60 * 1000); 
+
+    if (ahora > tiempoPosibleCancelacion) {
+      return res.status(400).json({ error: "No se puede cancelar la reserva con menos de 2 horas de anticipación" });
+
+    }else{
+      reserva.estado = 'CANCELADO';
+      await reserva.save();
+
+      await Product.updateMany(
+        { _id: { $in: reserva.productos } },
+        { estadoUso: 'DISPONIBLE' }
+      );
+      res.json(reserva);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
